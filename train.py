@@ -17,7 +17,20 @@ def parse_args():
         required=False,
         help='label path'
     )
-
+    parser.add_argument(
+        '--epoch',
+        default=100,
+        type=int,
+        required=False,
+        help='Set epochs'
+    )
+    parser.add_argument(
+        '--model_name',
+        default='MNIST_model',
+        type=str,
+        required=False,
+        help='Set model name'
+    )
     args = parser.parse_args()
     return args
 
@@ -37,24 +50,23 @@ class Dataloader(Sequence):
         self.dataset_path = dataset_path 
         self.label_path = label_path
 
-    def load_images(self, path):
-        images = []
-        file_list = os.listdir(path)
-        
-        for file in file_list:
-            if os.path.splitext(file)[-1] == '.jpg':
-                images.append(plt.imread(os.path.join(path, file)))
-        return np.array(images)
-
     def load_labels(self, path):
         path = os.path.join(path, 'labels.csv')
         return pd.read_csv(path)
     
     def get_datasets(self, file='train'):
         path = os.path.join(self.dataset_path, file)
-        print(path)
-        datasets = self.load_images(path)
-        labels = self.load_labels(path)
+        df = self.load_labels(path)
+        
+        datasets = []
+        labels = []
+        for image, label in df.values:
+            image_path = os.path.join(path, image)
+            datasets.append(plt.imread(image_path))
+
+            labels.append(label)
+
+        datasets = np.array(datasets)
         return (datasets, labels)
 
 args = parse_args()
@@ -65,6 +77,7 @@ datasets = Dataloader(args.dataset_path, args.label_path)
 x_train, y_train = datasets.get_datasets('train')
 print(len(x_train))
 x_test, y_test = datasets.get_datasets('test')
+print(len(x_test))
 
 # 입력 데이터를 [0, 1] 범위로 정규화합니다.
 x_train = x_train.astype('float32') / 255.0
@@ -102,11 +115,11 @@ print(model.summary())
 
 # 모델 학습
 print('train_model')
-model.fit(x_train, y_train, epochs=20, batch_size=64, validation_data=(x_test, y_test))
+model.fit(x_train, y_train, epochs=args.epoch, batch_size=64, validation_data=(x_test, y_test))
 
 # 모델 평가
 test_loss, test_acc = model.evaluate(x_test, y_test)
 print(f"테스트 정확도: {test_acc}")
 
 # 모델 저장
-model.save('mnist_model.h5')
+model.save(args.model_name+'.h5')

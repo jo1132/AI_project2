@@ -31,6 +31,7 @@ args = parse_args()
 # 데이터를 로드합니다.
 print('load data')
 image = np.array(plt.imread(args.data_path))
+image = image.reshape(-1, 28, 28, 1)
 
 # 모델을 로드합니다.
 model = load_model(args.model_path)
@@ -44,6 +45,8 @@ print(model.summary())
 # 모델 예측
 print('모델 예측')
 pred = model.predict(image)
+pred = np.argmax(pred)
 
 # 모델 추론 결과
-print(f"이 이미지는 {pred} 입니다.")
+print(f"모델 예측: {pred}")
+
