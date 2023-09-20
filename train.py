@@ -70,9 +70,15 @@ x_test, y_test = datasets.get_datasets('test')
 x_train = x_train.astype('float32') / 255.0
 x_test = x_test.astype('float32') / 255.0
 
+# 딥력데이터의 모양을 바꿉니다.
+x_train = x_train.reshape(-1, 28, 28, 1)
+x_test = x_test.reshape(-1, 28, 28, 1)
+
 # 레이블을 one-hot 인코딩합니다.
 y_train = to_categorical(y_train, 10)
 y_test = to_categorical(y_test, 10)
+
+
 
 # 모델을 정의합니다.
 model = models.Sequential([
@@ -96,7 +102,7 @@ print(model.summary())
 
 # 모델 학습
 print('train_model')
-model.fit(x_train, y_train, epochs=5, batch_size=64, validation_data=(x_test, y_test))
+model.fit(x_train, y_train, epochs=20, batch_size=64, validation_data=(x_test, y_test))
 
 # 모델 평가
 test_loss, test_acc = model.evaluate(x_test, y_test)
