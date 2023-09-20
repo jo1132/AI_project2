@@ -4,7 +4,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='get arguments')
 
     parser.add_argument(
-        '--data_path',
+        '--image_path',
         default='/root/scikit_learn_data/test/0.jpg',
         type=str,
         required=False,
@@ -25,12 +25,17 @@ def parse_args():
 import numpy as np
 import matplotlib.pyplot as plt
 from tensorflow.keras.models import load_model
+from PIL import Image
 
 args = parse_args()
 
 # 데이터를 로드합니다.
 print('load data')
-image = np.array(plt.imread(args.data_path))
+print('image_path:', args.image_path)
+image = Image.open(args.image_path).convert("L")
+image.thumbnail((28, 28),  Image.NEAREST)
+image = image.resize((28, 28))
+image = np.array(image)
 image = image.reshape(-1, 28, 28, 1)
 
 # 모델을 로드합니다.
@@ -40,10 +45,9 @@ model = load_model(args.model_path)
 image = image.astype('float32') / 255.0
 
 # 모델 요약
-print(model.summary())
+#print(model.summary())
 
 # 모델 예측
-print('모델 예측')
 pred = model.predict(image)
 pred = np.argmax(pred)
 
