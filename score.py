@@ -1,8 +1,5 @@
 import argparse
-
 import sklearn
-from sklearn.metrics import accuracy_score
-
 import pandas as pd
 import random
 
@@ -11,7 +8,7 @@ def parse_args():
 
     parser.add_argument(
         '--label_path',
-        default='/root/scikit_learn_data/test/labels.csv',
+        default='./dataset/midterm/Validation/label.csv',
         type=str,
         required=False,
         help='scoring label path'
@@ -19,7 +16,7 @@ def parse_args():
 
     parser.add_argument(
         '--pred_path',
-        default='/root/scikit_learn_data/test/labels.csv',
+        default='./dataset/midterm/Validation/label.csv',
         type=str,
         required=False,
         help='predicted label path'
@@ -33,36 +30,34 @@ def parse_args():
         help='predict as random',
     )
 
-    parser.add_argument(
-        '--demo',
-        default=False,
-        type=bool,
-        required=False,
-        help='For Demo',
-    )
-
-
     args = parser.parse_args()
     return args
+
+def  score_two_csv(pred_df, labels_df):
+    score = 0
+    labels = labels_df.set_index(['image'])
+
+    pred_names = pred_df['image'].values
+    for name, label in pred_df.values:
+        score += 1 if labels.loc[name]['label'] == label else 0
+    
+    return score / len(labels_df)
 
 
 args = parse_args()
 label_path = args.label_path
 labels = pd.read_csv(label_path)
-labels = labels.loc[:, '1']
 
 if args.random:
-    num = [i for i in range(10)]
-    pred = [random.choice(num) for _ in range(len(labels))]
-
-elif (args.demo):
-    pred_path = args.pred_path
-    pred = pd.read_csv(pred_path)
-    pred = pred.loc[:, ['1']]
+    num = [i for i in range(10)] 
+    pred_random = [random.choice(num) for _ in range(len(labels))]
+    pred = pd.DataFrame(labels['image'], columns=['image'])
+    pred['label'] = pred_random
 
 else:
     pred_path = args.pred_path
     pred = pd.read_csv(pred_path)
 
-acc = accuracy_score(pred, labels)
+
+acc = score_two_csv(pred, labels)
 print('accuracy:', acc)
