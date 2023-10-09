@@ -12,7 +12,7 @@ def parse_args():
     )
     parser.add_argument(
         '--model_path',
-        default='/root/mnist_model.h5',
+        default='/root/Train_Model.h5',
         type=str,
         required=False,
         help='model path'
