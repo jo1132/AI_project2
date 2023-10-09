@@ -8,7 +8,7 @@ def parse_args():
 
     parser.add_argument(
         '--label_path',
-        default='./dataset/midterm/Validation/label.csv',
+        default='./dataset/midterm/label.csv',
         type=str,
         required=False,
         help='scoring label path'
