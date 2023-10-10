@@ -16,7 +16,7 @@ def parse_args():
 
     parser.add_argument(
         '--pred_path',
-        default='./dataset/midterm/Validation/label.csv',
+        default='./dataset/midterm/label.csv',
         type=str,
         required=False,
         help='predicted label path'
